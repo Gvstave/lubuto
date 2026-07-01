@@ -1,8 +1,6 @@
 const fs = require("fs");
 const config = require("../config.json")
 const path = require("path");
-
-// const LESSONS_DIR = path.join(__dirname, "..", "lessons");
 const LESSONS_DIR = path.resolve(config.lessonDirectory);
 
 /**
