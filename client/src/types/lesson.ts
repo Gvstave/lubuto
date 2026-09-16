@@ -1,27 +1,23 @@
 export interface Lesson {
+  id: string;
 
-    id: string;
+  name: string;
 
-    name: string;
+  displayName: string;
 
-    displayName: string;
+  lessonNumber: number;
 
-    lessonNumber: number;
+  language: string;
 
-    language: string;
-
-    path: string;
-
+  path: string;
 }
 
 export interface Language {
+  id: string;
 
-    id: string;
+  name: string;
 
-    name: string;
+  lessonCount: number;
 
-    lessonCount: number;
-
-    children: Lesson[];
-
+  children: Lesson[];
 }

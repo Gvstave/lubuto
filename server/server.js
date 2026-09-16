@@ -2,5 +2,5 @@ const app = require("./app");
 const PORT = 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server has started on http://localhost:${PORT}`);
+  console.log(`Server has started on http://localhost:${PORT}`);
 });

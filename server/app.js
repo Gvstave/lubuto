@@ -10,10 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use(
-    "/lessons",
-    express.static(path.resolve(config.lessonDirectory))
-);
+app.use("/lessons", express.static(path.resolve(config.lessonDirectory)));
 
 app.use("/api", lessonRoutes);
 
