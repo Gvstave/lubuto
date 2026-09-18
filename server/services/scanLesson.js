@@ -1,7 +1,9 @@
 const fs = require("fs");
 const config = require("../config.json");
 const path = require("path");
-const LESSONS_DIR = path.resolve(config.lessonDirectory);
+const LESSONS_DIR = path.isAbsolute(config.lessonDirectory)
+  ? config.lessonDirectory
+  : path.resolve(__dirname, "../..", config.lessonDirectory);
 
 /**
  * Reads all language folders and lesson folders.

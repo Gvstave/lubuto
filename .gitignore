@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Generated client and server builds
+client/dist/
+server/dist/
+dist/
+
+# Local lesson content; distribute separately with the desktop bundle
+/LUBUTO LITERACY LESSONS/
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor and operating-system files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

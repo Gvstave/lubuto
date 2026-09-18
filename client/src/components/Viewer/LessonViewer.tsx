@@ -19,7 +19,7 @@ export default function LessonViewer({ lesson, showNotFound }: Props) {
   return (
     <iframe
       src={`http://localhost:5000${lesson}`}
-      className="w-full h-full border-0"
+      className="block min-w-0 min-h-0 w-full h-full overflow-auto border-0"
       title="Lesson viewer"
     />
   );

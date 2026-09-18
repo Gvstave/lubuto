@@ -1,24 +1,17 @@
 {
-  "name": "server",
+  "name": "lubuto-reader",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "fmt": "oxfmt",
-    "fmt:Check": "oxfmt --check"
+  "main": "index.html",
+  "node-main": "server.js",
+  "window": {
+    "title": "Lubuto Reader",
+    "width": 1200,
+    "height": 800,
+    "toolbar": false,
+    "position": "center"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14",
-    "oxfmt": "^0.57.0"
   }
 }

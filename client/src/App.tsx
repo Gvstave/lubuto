@@ -7,6 +7,7 @@ import NotFound from "./components/NotFound";
 export default function App() {
   const { tree, loading } = useLessonTree();
   const [path, setPath] = useState(() => window.location.pathname);
+  const [explorerOpen, setExplorerOpen] = useState(true);
   const [languageId, lessonPart] = path.split("/").filter(Boolean);
   const lessonNumber = Number(lessonPart);
   const hasLessonRoute = Boolean(languageId && lessonPart);
@@ -33,12 +34,16 @@ export default function App() {
   if (!loading && tree.length === 0) return <NotFound />;
 
   return (
-    <div className="grid grid-cols-[320px_1fr] h-screen">
+    <div
+      className={`grid h-screen min-h-0 overflow-hidden ${explorerOpen ? "grid-cols-[320px_minmax(0,1fr)]" : "grid-cols-[0_minmax(0,1fr)]"}`}
+    >
       <Explorer
         tree={tree}
         onSelect={handleSelect}
         activeLanguageId={languageId}
         activeLessonNumber={hasValidLessonNumber ? lessonNumber : undefined}
+        isOpen={explorerOpen}
+        onToggle={() => setExplorerOpen((current) => !current)}
       />
       <LessonViewer
         lesson={selectedLessonPath}
