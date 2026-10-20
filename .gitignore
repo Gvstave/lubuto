@@ -7,9 +7,6 @@ server/dist/
 dist/
 electron-dist/
 
-# Local lesson content; distribute separately with the desktop bundle
-/LUBUTO LITERACY LESSONS/
-
 # Environment and local configuration
 .env
 .env.*

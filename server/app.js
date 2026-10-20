@@ -48,9 +48,7 @@ app.use("/lessons", (req, res, next) => {
   }
 
   const html = fs.readFileSync(lessonPath, "utf8");
-  const layoutLink = `<link rel="stylesheet" type="text/css" href="/lessons/lesson-layout.css" />
-  <link rel="stylesheet" type="text/css" href="/lessons/buttons.css" />
-  <style>
+  const layoutOverrides = `<style>
     html, body {
       height: auto !important;
       min-height: 100% !important;
@@ -127,8 +125,8 @@ app.use("/lessons", (req, res, next) => {
         box-sizing: border-box;
         border: 4px solid #3d2b1f;
         border-radius: 12px;
-        background: #526668 !important;
-        box-shadow: inset 0 -5px 0 #4b5e60;
+        background: #ffd54f !important;
+        box-shadow: inset 0 -6px 0 #f9a825 !important;
         color: transparent !important;
         font-size: 0;
       }
@@ -200,19 +198,40 @@ app.use("/lessons", (req, res, next) => {
     }
   </style>`;
   const menuMessageHandler = `<script>
+    function syncLessonMenuState() {
+      var siteNav = document.getElementById("siteNav");
+      if (!siteNav || !document.body) return;
+      document.body.classList.toggle("no-nav", getComputedStyle(siteNav).display === "none");
+    }
+
     function removeLegacyHideToggle() {
       document.querySelectorAll("a#toggle-nav.hide-nav").forEach(function (toggle) {
         toggle.remove();
       });
+      syncLessonMenuState();
     }
 
-    window.addEventListener("DOMContentLoaded", removeLegacyHideToggle);
+    window.addEventListener("DOMContentLoaded", function () {
+      removeLegacyHideToggle();
+      var siteNav = document.getElementById("siteNav");
+      if (siteNav) {
+        new MutationObserver(syncLessonMenuState).observe(siteNav, {
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
+      document.addEventListener("click", function (event) {
+        if (event.target.closest("#toggle-nav, #lubuto-toggle-nav")) {
+          window.setTimeout(syncLessonMenuState, 0);
+        }
+      });
+    });
 
     window.addEventListener("message", function (event) {
       if (event.data && event.data.type === "lubuto:close-menu") {
         var siteNav = document.getElementById("siteNav");
         if (siteNav) siteNav.style.display = "none";
-        if (document.body) document.body.classList.add("no-nav");
+        syncLessonMenuState();
       }
     });
   </script>`;
@@ -259,7 +278,7 @@ app.use("/lessons", (req, res, next) => {
   );
   const lessonHtml = normalizeNavigationButtons(html)
     .replace(/(<div id=["']emptyHeader["'][^>]*><\/div>)/i, `$1${menuButton}`)
-    .replace("</head>", `${layoutLink}${menuMessageHandler}${activityBootstrap}</head>`)
+    .replace("</head>", `${layoutOverrides}${menuMessageHandler}${activityBootstrap}</head>`)
     .replace(/<div id=["']siteNav["']>/i, '<div id="siteNav" style="display: none;">');
   res.type("html").send(lessonHtml);
 });

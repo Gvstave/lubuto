@@ -25,7 +25,6 @@ LUBUTO LITERACY LESSONS/
 		01_Icibemba/
 			index.html
 ```
-
 ## Development
 
 Install dependencies in both application parts:

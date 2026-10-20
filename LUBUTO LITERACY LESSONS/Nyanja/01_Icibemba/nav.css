@@ -130,8 +130,8 @@ a .exe-client-search-result{color:#00566a}
     padding: 0;
     border: 4px solid #3d2b1f;
     border-radius: 12px;
-    background: #526668;
-    box-shadow: inset 0 -5px 0 #4b5e60;
+    background: #ffd54f;
+    box-shadow: inset 0 -6px 0 #f9a825;
 }
 #header-options #toggle-nav.kid-btn svg,
 #nav-toggler #toggle-nav.kid-btn svg {
