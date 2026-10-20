@@ -1,0 +1,154 @@
+.kid-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #3d2b1f;
+    /* Dark cartoon outline */
+    border-radius: 28px;
+    cursor: pointer;
+    color: white;
+    font-size: 26px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.1s ease-in-out;
+    /* Thick text stroke for cartoon style */
+    text-shadow:
+        -2px -2px 0 #3d2b1f,
+        2px -2px 0 #3d2b1f,
+        -2px 2px 0 #3d2b1f,
+        2px 2px 0 #3d2b1f;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+}
+
+/* Squishy click effect */
+.kid-btn:active {
+    transform: translateY(8px);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.kid-btn svg {
+    fill: white;
+    stroke: #3d2b1f;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    width: 50px;
+    height: 50px;
+}
+
+/* --- Specific Button Styles --- */
+
+/* Home Button */
+.btn-home {
+    background-color: #ffd54f;
+    box-shadow: inset 0 -12px 0 #f9a825;
+    width: 110px;
+    height: 110px;
+}
+
+/* Back Button */
+.btn-back {
+    background-color: #ffd54f !important;
+    box-shadow: inset 0 -12px 0 #f9a825 !important;
+    padding: 8px 16px;
+}
+
+.btn-back svg {
+    width: 34px;
+    height: 34px;
+}
+
+/* Next Button */
+.btn-next {
+    background-color: #ffd54f !important;
+    box-shadow: inset 0 -12px 0 #f9a825 !important;
+    padding: 8px 16px;
+}
+
+.btn-next svg {
+    width: 34px;
+    height: 34px;
+}
+
+/* Menu Button */
+#header-options,
+#nav-toggler {
+    z-index: 1001;
+}
+
+.btn-menu {
+    background-color: #ffd54f !important;
+    box-shadow: inset 0 -6px 0 #f9a825 !important;
+    border-radius: 12px;
+    box-sizing: border-box !important;
+    width: 56px !important;
+    height: 56px !important;
+}
+
+.btn-menu svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Landing pages use the arrow in the header; do not repeat the old text link below the lesson. */
+#bottomPagination {
+    display: none;
+}
+
+/* Shared activity-heading treatment, matching Bemba Lesson 1 Page 4. */
+.iDevice_header {
+    min-height: 0;
+    padding: 4px;
+    background-image: none !important;
+}
+
+.iDeviceTitle {
+    display: inline;
+    color: #007691;
+    font-size: 1.4em;
+    font-weight: normal;
+    line-height: 32px;
+    letter-spacing: .5px;
+    vertical-align: top;
+}
+
+.hidden-idevice .iDeviceTitle {
+    color: #526668;
+}
+
+/* Compact, background-free interactive activity layout from Bemba Lesson 1. */
+#content {
+    padding-bottom: 4px;
+    background-color: transparent !important;
+}
+
+.ImageMapIdevice .iDevice,
+.DragNDropIdevice .iDevice {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.ImageMapIdevice,
+.DragNDropIdevice {
+    width: 100%;
+    max-width: 909px;
+    margin: 0 auto;
+}
+
+.ImageMapIdevice .iDevice_wrapper,
+.ImageMapIdevice .iDevice_content_wrapper,
+.DragNDropIdevice .iDevice_wrapper,
+.DragNDropIdevice .iDevice_content_wrapper {
+    margin: 0;
+    padding: 0;
+}
+
+.ImageMapIdevice .iDevice_inner,
+.DragNDropIdevice .iDevice_inner {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}

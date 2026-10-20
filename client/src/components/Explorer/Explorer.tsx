@@ -27,13 +27,18 @@ export default function Explorer({
     );
   }
 
+  const visibleExpanded = isOpen ? expanded : [];
+
   return (
     <div
-      className={`relative h-full min-h-0 overflow-visible text-black border-r border-gray-300 ${isOpen ? "" : "pointer-events-none"}`}
+      className="relative h-full min-h-0 overflow-visible border-r border-gray-300 bg-white text-black"
     >
       <button
         type="button"
-        onClick={onToggle}
+        onClick={() => {
+          if (isOpen) setExpanded([]);
+          onToggle();
+        }}
         className="pointer-events-auto absolute top-2 right-0 z-10 translate-x-full rounded-r border border-l-0 border-gray-300 bg-white p-2 text-gray-700 shadow-sm hover:bg-[#cfdce1]"
         aria-label={isOpen ? "Close explorer" : "Open explorer"}
         title={isOpen ? "Close explorer" : "Open explorer"}
@@ -42,7 +47,7 @@ export default function Explorer({
       </button>
       <div className={isOpen ? "h-full min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain" : "hidden"}>
         {tree.map((language) => {
-          const isOpen = expanded.includes(language.id);
+          const languageIsOpen = visibleExpanded.includes(language.id);
 
           return (
             <div key={language.id}>
@@ -50,11 +55,11 @@ export default function Explorer({
                 className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#cfdce1] ${language.id === activeLanguageId ? "bg-[#cfdce1] font-medium" : ""}`}
                 onClick={() => toggle(language.id)}
               >
-                {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                {languageIsOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 <span>{language.name}</span>
                 <span className="ml-auto ">{language.lessonCount}</span>
               </div>
-              {isOpen &&
+              {languageIsOpen &&
                 language.children.map((lesson) => (
                   <div
                     key={lesson.id}

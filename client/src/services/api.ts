@@ -1,6 +1,7 @@
 import type { Language } from "../types/lesson";
 
-const API = "http://localhost:5000/api";
+const LESSON_SERVER_HOST = window.location.hostname === "127.0.0.1" ? "127.0.0.1" : "localhost";
+const API = `http://${LESSON_SERVER_HOST}:5000/api`;
 
 export async function getLessonTree(): Promise<Language[]> {
   const response = await fetch(`${API}/tree`);

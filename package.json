@@ -1,0 +1,50 @@
+{
+  "name": "lubuto-reader-desktop",
+  "version": "1.0.0",
+  "description": "Offline Lubuto literacy lesson reader for Windows.",
+  "private": true,
+  "main": "electron-dist/main.js",
+  "scripts": {
+    "client:dev": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "electron:compile": "tsc -p tsconfig.electron.json",
+    "electron": "npm run electron:compile && electron .",
+    "build": "npm run client:build && npm run electron:compile",
+    "dist": "npm run build && electron-builder"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "typescript": "^6.0.2"
+  },
+  "build": {
+  "appId": "com.lubuto.reader",
+  "productName": "Lubuto Reader",
+
+  "files": [
+    "electron-dist/**/*",
+    "client/dist/**/*",
+    "package.json"
+  ],
+
+  "extraResources": [
+    {
+      "from": "server",
+      "to": "server",
+      "filter": [
+        "**/*",
+        "!node_modules"
+      ]
+    },
+    {
+      "from": "server/node_modules",
+      "to": "server/node_modules"
+    }
+  ],
+
+  "win": {
+    "target": "portable"
+  }
+}
+}

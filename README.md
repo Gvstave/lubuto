@@ -67,7 +67,22 @@ cd client
 npm run build
 ```
 
-Copy the generated `client/dist` folder into the desktop bundle as `dist` so the backend can serve it.
+## Electron desktop executable
+
+Build the Windows executable from the repository root:
+
+```powershell
+npm run dist
+```
+
+The generated executable does not include lesson content. Place a folder named
+`lessons` beside the executable; at startup the app scans and serves those
+local files only. The reader also stores the last selected language and lesson
+in the device's browser local storage, so it can resume the learner's most
+recent lesson after being reopened.
+
+The `lessons` folder must contain the `Language/Lesson/index.html` structure.
+It can be updated or replaced without rebuilding the executable.
 
 ## NW.js desktop offshoot
 

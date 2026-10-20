@@ -1,6 +1,23 @@
 const app = require("./app");
-const PORT = 5000;
 
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
+
+const server = app.listen(PORT, () => {
   console.log(`Server has started on http://localhost:${PORT}`);
+
+  if (process.send) {
+    process.send("ready");
+  }
+});
+
+process.on("SIGTERM", () => {
+  server.close(() => {
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", () => {
+  server.close(() => {
+    process.exit(0);
+  });
 });

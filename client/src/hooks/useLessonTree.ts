@@ -5,12 +5,17 @@ import type { Language } from "../types/lesson";
 export function useLessonTree() {
   const [tree, setTree] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     getLessonTree()
-      .then(setTree)
+      .then((lessons) => {
+        setTree(lessons);
+        setError(false);
+      })
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
-  return { tree, loading };
+  return { tree, loading, error };
 }

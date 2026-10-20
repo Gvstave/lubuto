@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="110" height="110">
+  <!-- Main button background -->
+  <rect x="0" y="0" width="110" height="110" rx="24" fill="#3a4749" />
+
+  <!-- Centered Menu Icon (Scaled to 60x60 inside the 110x110 box) -->
+  <svg x="25" y="25" width="60" height="60" viewBox="0 0 24 24" fill="#ffffff">
+    <!-- Top Dot and Line -->
+    <circle cx="6" cy="6" r="2.5" />
+    <rect x="11" y="4" width="9" height="4" rx="2" />
+    <!-- Middle Dot and Line -->
+    <circle cx="6" cy="12" r="2.5" />
+    <rect x="11" y="10" width="9" height="4" rx="2" />
+    <!-- Bottom Dot and Line -->
+    <circle cx="6" cy="18" r="2.5" />
+    <rect x="11" y="16" width="9" height="4" rx="2" />
+  </svg>
+</svg>

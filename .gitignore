@@ -5,6 +5,7 @@ node_modules/
 client/dist/
 server/dist/
 dist/
+electron-dist/
 
 # Local lesson content; distribute separately with the desktop bundle
 /LUBUTO LITERACY LESSONS/

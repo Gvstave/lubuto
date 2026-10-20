@@ -1,15 +1,17 @@
 {
-  "name": "lubuto-reader",
+  "name": "server",
   "version": "1.0.0",
-  "main": "index.html",
-  "node-main": "server.js",
-  "window": {
-    "title": "Lubuto Reader",
-    "width": 1200,
-    "height": 800,
-    "toolbar": false,
-    "position": "center"
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1"
