@@ -1,0 +1,138 @@
+name: Release
+
+# Publishes a Windows release when a pull request whose title contains
+# "[RELEASE]" is merged into main. The build check (CI) runs again on the
+# merged code first; packaging only starts if it passes.
+#
+# Release tag is v<version> from package.json. Bump the version in the
+# [RELEASE] PR; the job fails if that tag already exists.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.title, '[RELEASE]')
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: verify
+    runs-on: windows-latest
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+    steps:
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Read version and check tag is free
+        id: version
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          if gh release view "$TAG" > /dev/null 2>&1 || git ls-remote --exit-code --tags origin "refs/tags/${TAG}" > /dev/null; then
+            echo "::error::Release ${TAG} already exists. Bump \"version\" in package.json in the [RELEASE] PR."
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          npm ci
+          npm --prefix client ci
+          npm --prefix server ci --omit=dev
+
+      - name: Build client and Electron main
+        run: npm run build
+
+      - name: Package Windows portable exe
+        run: npx electron-builder --win portable --publish never
+        env:
+          # Unsigned build; stop electron-builder from looking for a cert.
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Bundle exe with lesson content
+        id: bundle
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          NAME="LubutoReader-${VERSION}-win-x64"
+          EXE=$(ls dist/*.exe | head -n 1)
+          mkdir -p "release/${NAME}"
+          cp "$EXE" "release/${NAME}/Lubuto Reader.exe"
+          # The packaged app reads lessons from a folder beside the exe.
+          cp -r "LUBUTO LITERACY LESSONS" "release/${NAME}/"
+          (cd release && 7z a -tzip -mx=5 "${NAME}.zip" "${NAME}" > /dev/null)
+          cp "$EXE" "release/${NAME}.exe"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          ls -lh release
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle.outputs.name }}
+          path: release/${{ steps.bundle.outputs.name }}.zip
+          retention-days: 14
+
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NAME: ${{ steps.bundle.outputs.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+          NOTES=$(printf '%s\n\n%s\n%s\n' \
+            "Released from PR #${PR_NUMBER}: ${PR_TITLE} (${PR_URL})" \
+            "- **${NAME}.zip**: full app (exe + LUBUTO LITERACY LESSONS folder). Extract and run 'Lubuto Reader.exe'." \
+            "- **${NAME}.exe**: exe only. Place next to an existing 'LUBUTO LITERACY LESSONS' folder.")
+          gh release create "$TAG" \
+            "release/${NAME}.zip" \
+            "release/${NAME}.exe" \
+            --target "$MERGE_SHA" \
+            --title "Lubuto Reader ${VERSION}" \
+            --notes "$NOTES" \
+            --generate-notes \
+            --latest
+
+      - name: Comment release link on PR
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" \
+            --body "Released ${TAG}: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${TAG}"
