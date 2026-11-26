@@ -27,7 +27,12 @@ function isServerRunning(): Promise<boolean> {
 function getLessonsDirectory(): string {
   // Development reads directly from the repository.
   if (!app.isPackaged) {
-    return path.join(app.getAppPath(), "LUBUTO LITERACY LESSONS");
+    return path.join(
+      app.getAppPath(),
+      "client",
+      "public",
+      "LUBUTO LITERACY LESSONS"
+    );
   }
 
   // Portable executables unpack to a temporary location. This variable points
@@ -35,7 +40,7 @@ function getLessonsDirectory(): string {
   const executableDirectory =
     process.env.PORTABLE_EXECUTABLE_DIR ?? path.dirname(process.execPath);
 
-  return path.join(executableDirectory, "lessons");
+  return path.join(executableDirectory, "LUBUTO LITERACY LESSONS");
 }
 
 async function startLessonServer(): Promise<void> {
@@ -96,6 +101,9 @@ function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    icon: app.isPackaged
+      ? path.join(process.resourcesPath, "icon.ico")
+      : path.join(app.getAppPath(), "build", "icon.ico"),
 
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

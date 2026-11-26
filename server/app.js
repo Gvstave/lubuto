@@ -48,6 +48,9 @@ app.use("/lessons", (req, res, next) => {
   }
 
   const html = fs.readFileSync(lessonPath, "utf8");
+  const sharedLessonStyles = `
+    <link rel="stylesheet" type="text/css" href="/lessons/lesson-layout.css" />
+    <link rel="stylesheet" type="text/css" href="/lessons/buttons.css" />`;
   const layoutOverrides = `<style>
     html, body {
       height: auto !important;
@@ -71,6 +74,11 @@ app.use("/lessons", (req, res, next) => {
 
     #main-wrapper {
       max-width: none !important;
+    }
+
+    .no-nav #main-wrapper {
+      padding-left: 25px !important;
+      padding-right: 25px !important;
     }
 
     @media screen and (min-width: 769px) {
@@ -277,8 +285,9 @@ app.use("/lessons", (req, res, next) => {
       ),
   );
   const lessonHtml = normalizeNavigationButtons(html)
+    .replace(/\s*<p[^>]*class=["'][^"']*toggle-idevice[^"']*["'][\s\S]*?<\/p>/gi, "")
     .replace(/(<div id=["']emptyHeader["'][^>]*><\/div>)/i, `$1${menuButton}`)
-    .replace("</head>", `${layoutOverrides}${menuMessageHandler}${activityBootstrap}</head>`)
+    .replace("</head>", `${sharedLessonStyles}${layoutOverrides}${menuMessageHandler}${activityBootstrap}</head>`)
     .replace(/<div id=["']siteNav["']>/i, '<div id="siteNav" style="display: none;">');
   res.type("html").send(lessonHtml);
 });

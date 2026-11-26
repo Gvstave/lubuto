@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import logo from "../../../public/logo_fullcolor_rgb_web.jpg";
+import logo from "../../../public/lubuto-logo.png";
 import NotFound from "../NotFound";
 
 interface Props {

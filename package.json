@@ -40,11 +40,16 @@
     {
       "from": "server/node_modules",
       "to": "server/node_modules"
+    },
+    {
+      "from": "build/icon.ico",
+      "to": "icon.ico"
     }
   ],
 
   "win": {
-    "target": "portable"
+    "target": "portable",
+    "icon": "build/icon.ico"
   }
 }
 }

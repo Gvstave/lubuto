@@ -17,7 +17,7 @@ export default function App() {
   const [path, setPath] = useState(getCurrentPath);
   const [languageId, lessonPart] = path.split("/").filter(Boolean);
   const lessonNumber = Number(lessonPart);
-  const [isExplorerOpen, setIsExplorerOpen] = useState(true);
+  const [isExplorerOpen, setIsExplorerOpen] = useState(false);
   const hasLessonRoute = Boolean(languageId && lessonPart);
   const hasValidLessonNumber = Number.isFinite(lessonNumber);
 

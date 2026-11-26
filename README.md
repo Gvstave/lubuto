@@ -74,44 +74,13 @@ Build the Windows executable from the repository root:
 npm run dist
 ```
 
-The generated executable does not include lesson content. Place a folder named
-`lessons` beside the executable; at startup the app scans and serves those
-local files only. The reader also stores the last selected language and lesson
-in the device's browser local storage, so it can resume the learner's most
-recent lesson after being reopened.
+The packaged backend scans a sibling folder named `LUBUTO LITERACY LESSONS`;
+place the lesson folder beside the executable for it to be served. The reader
+also stores the last selected language and lesson in the device's browser local
+storage, so it can resume the learner's most recent lesson after being reopened.
 
-The `lessons` folder must contain the `Language/Lesson/index.html` structure.
-It can be updated or replaced without rebuilding the executable.
+The folder must contain the `Language/Lesson/index.html` structure. It can be
+updated or replaced without rebuilding the executable.
 
-## NW.js desktop offshoot
-
-The operational desktop app is the separate NW.js bundle, currently located at `Lubuto Reader/`. It contains:
-
-```text
-Lubuto Reader/
-	nw.exe                    NW.js runtime
-	package.json              NW.js window and Node entry configuration
-	server.js                 Starts the embedded Express backend
-	app.js                    Desktop backend routes
-	dist/                     Built React client
-	LUBUTO LITERACY LESSONS/  Desktop lesson content
-```
-
-The desktop application starts `server.js` through the `node-main` setting in `package.json`. The embedded backend serves both `dist` and the local lessons folder, so the app can operate without an internet connection or a separate Node.js installation.
-
-To update the desktop app:
-
-1. Build the client with `npm run build` from `client`.
-2. Replace the NW.js bundle's `dist` folder with the generated `client/dist` folder.
-3. Copy or update `LUBUTO LITERACY LESSONS` in the NW.js bundle.
-4. Confirm `config.json` contains:
-
-	 ```json
-	 {
-		 "lessonDirectory": "LUBUTO LITERACY LESSONS"
-	 }
-	 ```
-
-5. Start the NW.js bundle with `nw.exe` or open the packaged desktop executable.
-
-The NW.js bundle is the deployable desktop application. The `client` and `server` folders in this repository are the source used to develop and produce that bundle.
+The development app uses the three-lesson demo set in
+`client/public/LUBUTO LITERACY LESSONS` (Bemba, Kaonde, and Lozi).
