@@ -27,12 +27,7 @@ function isServerRunning(): Promise<boolean> {
 function getLessonsDirectory(): string {
   // Development reads directly from the repository.
   if (!app.isPackaged) {
-    return path.join(
-      app.getAppPath(),
-      "client",
-      "public",
-      "LUBUTO LITERACY LESSONS"
-    );
+    return path.join(app.getAppPath(), "LUBUTO LITERACY LESSONS");
   }
 
   // Portable executables unpack to a temporary location. This variable points

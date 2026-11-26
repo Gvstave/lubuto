@@ -82,6 +82,5 @@ storage, so it can resume the learner's most recent lesson after being reopened.
 The folder must contain the `Language/Lesson/index.html` structure. It can be
 updated or replaced without rebuilding the executable.
 
-The development app uses the nine-lesson demo set in
-`client/public/LUBUTO LITERACY LESSONS` (three lessons each for Bemba, Kaonde,
-and Lozi).
+The development app reads lessons from the same `LUBUTO LITERACY LESSONS`
+folder at the repository root.
