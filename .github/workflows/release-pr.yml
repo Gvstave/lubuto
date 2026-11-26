@@ -1,0 +1,117 @@
+name: PR Release Build
+
+# Builds the Windows portable app and publishes a downloadable pre-release
+# whenever a pull request title contains "[RELEASE]".
+# One pre-release per PR (tag: pr-<number>); it is rebuilt on every push.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-release-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    if: contains(github.event.pull_request.title, '[RELEASE]')
+    runs-on: windows-latest
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          npm ci
+          npm --prefix client ci
+          npm --prefix server ci --omit=dev
+
+      - name: Build client and Electron main
+        run: npm run build
+
+      - name: Package Windows portable exe
+        run: npx electron-builder --win portable --publish never
+        env:
+          # Unsigned build; stop electron-builder from looking for a cert.
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Bundle exe with lesson content
+        id: bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT_SHA=${HEAD_SHA::7}
+          NAME="LubutoReader-${VERSION}-pr${PR_NUMBER}-${SHORT_SHA}-win-x64"
+          EXE=$(ls dist/*.exe | head -n 1)
+          mkdir -p "release/${NAME}"
+          cp "$EXE" "release/${NAME}/Lubuto Reader.exe"
+          # The packaged app reads lessons from a folder beside the exe.
+          cp -r "LUBUTO LITERACY LESSONS" "release/${NAME}/"
+          (cd release && 7z a -tzip -mx=5 "${NAME}.zip" "${NAME}" > /dev/null)
+          cp "$EXE" "release/${NAME}.exe"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          ls -lh release
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle.outputs.name }}
+          path: release/${{ steps.bundle.outputs.name }}.zip
+          retention-days: 14
+
+      - name: Publish pre-release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NAME: ${{ steps.bundle.outputs.name }}
+          VERSION: ${{ steps.bundle.outputs.version }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+          TAG="pr-${PR_NUMBER}"
+          gh release delete "$TAG" --cleanup-tag --yes || true
+          NOTES=$(printf '%s\n\n%s\n\nCommit: %s\n\n%s\n%s\n' \
+            "Automated build from PR #${PR_NUMBER}: ${PR_TITLE}" \
+            "${PR_URL}" \
+            "${HEAD_SHA}" \
+            "- **${NAME}.zip**: full app (exe + LUBUTO LITERACY LESSONS folder). Extract and run 'Lubuto Reader.exe'." \
+            "- **${NAME}.exe**: exe only. Place next to an existing 'LUBUTO LITERACY LESSONS' folder.")
+          gh release create "$TAG" \
+            "release/${NAME}.zip" \
+            "release/${NAME}.exe" \
+            --target "$HEAD_SHA" \
+            --prerelease \
+            --title "Lubuto Reader ${VERSION} (PR #${PR_NUMBER})" \
+            --notes "$NOTES"
+
+      - name: Comment download link on PR
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          URL="${{ github.server_url }}/${{ github.repository }}/releases/tag/pr-${PR_NUMBER}"
+          gh pr comment "$PR_NUMBER" --edit-last --body "Release build ready for \`${HEAD_SHA::7}\`: ${URL}" \
+            || gh pr comment "$PR_NUMBER" --body "Release build ready for \`${HEAD_SHA::7}\`: ${URL}"
