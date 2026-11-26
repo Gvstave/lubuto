@@ -1,0 +1,63 @@
+name: CI
+
+# Build check for every pull request and every push to main.
+# Make "CI / build" a required status check in branch protection so a PR
+# can only merge (and therefore only release) once it passes.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Lessons are not needed to compile; skip the 278 MB checkout.
+          sparse-checkout: |
+            /*
+            !/LUBUTO LITERACY LESSONS/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm --prefix client ci
+          npm --prefix server ci --omit=dev
+
+      - name: Lint client
+        run: npm --prefix client run lint
+
+      - name: Build client and Electron main
+        run: npm run build
+
+      - name: Smoke test lesson server
+        run: |
+          mkdir -p /tmp/lessons/Test/01_Test
+          echo '<html><head></head><body>ok</body></html>' > /tmp/lessons/Test/01_Test/index.html
+          cd server
+          PORT=5055 LESSONS_DIR=/tmp/lessons node server.js &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:5055/api/tree > /tmp/tree.json && break; sleep 0.5; done
+          cat /tmp/tree.json
+          grep -q '"Test"' /tmp/tree.json
